@@ -11,13 +11,16 @@ def fixnewlines(text):
     return " ".join(text.split("\n"))
 
 def crawl(chapter):
-    r = requests.get('http://hpmor.com/chapter/{}'.format(chapter))
+    url = 'http://hpmor.com/chapter/{}'.format(chapter)
+    r = requests.get(url)
     title = fixnewlines(pq(r.text)('#chapter-title').text())
     paragraphs = pq(r.text)("#storycontent > p")
     contents = [fixnewlines(p.text) for p in paragraphs if p.text is not None]
     return {
         "title": title,
-        "contents": contents
+        "contents": contents,
+        "url": url,
+        "chapter_no": chapter
     }, r
 
 db.chapters.drop()
@@ -31,4 +34,4 @@ while True:
     id_ = db.chapters.insert(results)
     print(results["title"], id_)
     chapter_id += 1
-    time.sleep(3)
+    time.sleep(1)
